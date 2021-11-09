@@ -1,0 +1,66 @@
+version: '3'
+services:
+ #############################3
+  nginx: # nome do serviço
+    build: #vai buildar esse serviço configurado abaixo
+      dockerfile: ./docker/nginx/nginx.dockerfile # irá ir no dockerfile da aplicação q foi criaado o nginx
+      context: .
+    image: jhonatajr/nginx # irá pegar a imagem referenciada
+    container_name: nginx #nome do container
+    port:
+     - "80:80" #porta que o nginx irá usar # array
+     networks:
+       production-network #array
+    depends_on:
+      - "node1"
+      - "node2"
+      - "node3"
+##################################3
+  mongodb: # serviço do banco, não é necessário especificar porta ou dockerfile pq já quis pegar a existente (dockerhub)
+    image: mongo
+    networks: 
+      - production-network 
+##################################### micro serviços
+  node1:  #aplicações em node
+    build:
+      dockerfile: ./docker/alura/alura-books.dockerfile
+      context: .
+    image: jhonatajr/project
+    container_name: projectjhonata
+    ports:
+      - "3000" 
+    networks: 
+      - production-network
+    depends_on: # depende q o serviço do mongo suba pra eles subirem depois
+      - "mongodb"
+
+  node2: 
+    build:
+      dockerfile: ./docker/alura/alura-books.dockerfile
+      context: .
+    image: jhonatajr/project
+    container_name: projectjhonata2
+    ports:
+      - "3000" 
+    networks: 
+      - production-network
+    depends_on: # depende q o serviço do mongo suba pra eles subirem depois
+      - "mongodb"
+
+  node3: 
+    build:
+      dockerfile: ./docker/alura/alura-books.dockerfile
+      context: .
+    image: jhonatajr/project
+    container_name: projectjhonata3
+    ports:
+      - "3000" 
+    networks: 
+      - production-network
+    depends_on: # depende q o serviço do mongo suba pra eles subirem depois
+      - "mongodb"
+
+networks:
+  production-network:
+    driver: bridge
+
